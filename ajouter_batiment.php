@@ -1,9 +1,9 @@
 <?php
-include('menu.php');
-include('db.php'); // Connexion à la base de données
+//include('menu.php');
+include('db2.php'); // Connexion à la base de données
 
 // Vérifier si l'utilisateur est connecté
-session_start();
+//session_start();
 if (!isset($_SESSION['user_id'])) {
     echo "Vous devez être connecté pour accéder à cette page.";
     exit;
@@ -14,8 +14,11 @@ $user_id = $_SESSION['user_id']; // ID de l'utilisateur connecté
 $planete_id = isset($_GET['planete_id']) ? (int)$_GET['planete_id'] : 1;
 
 // Vérifier si la planète appartient à l'utilisateur
-$sql_planete = "SELECT * FROM planetes WHERE id = ? AND utilisateur_id = ?";
+$sql_planete = "SELECT * FROM planete WHERE id = ? AND utilisateur_id = ?";
 $stmt_planete = $conn->prepare($sql_planete);
+if (!$stmt_planete) {
+    die('Erreur de préparation de la requête : ' . htmlspecialchars($conn->error));
+}
 $stmt_planete->bind_param("ii", $planete_id, $user_id);
 $stmt_planete->execute();
 $planete_result = $stmt_planete->get_result();
@@ -33,6 +36,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     $sql = "INSERT INTO batiment (nom, niveau, planete_id) VALUES (?, ?, ?)";
     $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        die('Erreur de préparation de la requête : ' . htmlspecialchars($conn->error));
+    }
     $stmt->bind_param("sii", $nom, $niveau, $planete_id);
     $stmt->execute();
     $stmt->close();

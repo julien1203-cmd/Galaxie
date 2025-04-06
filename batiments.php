@@ -39,6 +39,9 @@ if ($result->num_rows > 0) {
         $planete_id = $row['planete_id'];
         $sql_planete = "SELECT nom FROM planete WHERE id = ?";
         $stmt_planete = $conn->prepare($sql_planete);
+        if ($stmt_planete === false) {
+            die('Erreur de préparation de la requête : ' . htmlspecialchars($conn->error));
+        }
         $stmt_planete->bind_param("i", $planete_id);
         $stmt_planete->execute();
         $result_planete = $stmt_planete->get_result();
@@ -46,6 +49,10 @@ if ($result->num_rows > 0) {
         echo "<td>" . htmlspecialchars($planete['nom']) . "</td>";
         
         echo "</tr>";
+        
+        // Fermer la requête préparée pour la planète
+        $stmt_planete->close();
+        $result_planete->free();
     }
 
     echo "</table>";
@@ -53,9 +60,12 @@ if ($result->num_rows > 0) {
     echo "Aucun bâtiment trouvé.";
 }
 
-// Fermer la requête préparée et la connexion à la base de données
-$stmt->close();
-$conn->close();
+// Inclure les fichiers pour ajouter et modifier les bâtiments
 include('modifier_batiment.php');
 include('ajouter_batiment.php');
+
+// Fermer la requête préparée et la connexion à la base de données
+//$stmt->close();
+//$result->free();
+//$conn->close();
 ?>
