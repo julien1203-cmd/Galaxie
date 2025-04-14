@@ -1,7 +1,7 @@
 <?php
 session_start();
 include('menu.php');
-include('db.php'); // Connexion à la base de données
+include('db2.php'); // Connexion à la base de données
 
 // Vérifier si l'utilisateur est connecté
 if (!isset($_SESSION['user_id'])) {
@@ -11,13 +11,17 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id']; // ID de l'utilisateur connecté
 
 // Vérifier si l'utilisateur possède un observatoire
+$observatoire_id = 5; // ID du bâtiment Observatoire dans la table utilisateur_batiments
 $sql_observatory = "
     SELECT niveau 
-    FROM batiments 
+    FROM utilisateur_batiments 
     WHERE utilisateur_id = ? 
-    AND nom_batiment = 'Observatoire'";
+    AND batiment_id = ?";
 $stmt_observatory = $conn->prepare($sql_observatory);
-$stmt_observatory->bind_param("i", $user_id);
+if (!$stmt_observatory) {
+    die("Erreur dans la préparation de la requête : " . $conn->error);
+}
+$stmt_observatory->bind_param("ii", $user_id, $observatoire_id);
 $stmt_observatory->execute();
 $result_observatory = $stmt_observatory->get_result();
 $observatory = $result_observatory->fetch_assoc();
@@ -31,7 +35,7 @@ if (!$observatory) {
 $niveau_observatoire = $observatory['niveau'];
 
 // Calculer les chances de découverte en fonction du niveau
-$chance_decouverte = $niveau_observatoire * 10; // Par exemple, chaque niveau augmente les chances de 10%
+$chance_decouverte = $niveau_observatoire * 10; // Chaque niveau augmente les chances de 10%
 
 // Lancer une observation
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['observer'])) {
@@ -44,6 +48,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['observer'])) {
         INSERT INTO observations (utilisateur_id, heure_debut, heure_fin) 
         VALUES (?, NOW(), FROM_UNIXTIME(?))";
     $stmt_insert = $conn->prepare($sql_insert_observation);
+    if (!$stmt_insert) {
+        die("Erreur dans la préparation de la requête : " . $conn->error);
+    }
     $stmt_insert->bind_param("ii", $user_id, $heure_fin);
     $stmt_insert->execute();
 
@@ -58,6 +65,9 @@ $sql_observation_en_cours = "
     WHERE utilisateur_id = ? 
     AND heure_fin > NOW()";
 $stmt_observation_en_cours = $conn->prepare($sql_observation_en_cours);
+if (!$stmt_observation_en_cours) {
+    die("Erreur dans la préparation de la requête : " . $conn->error);
+}
 $stmt_observation_en_cours->bind_param("i", $user_id);
 $stmt_observation_en_cours->execute();
 $result_observation_en_cours = $stmt_observation_en_cours->get_result();
