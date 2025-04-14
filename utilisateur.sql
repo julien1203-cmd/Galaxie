@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Hôte : 127.0.0.1:3306
--- Généré le : dim. 06 avr. 2025 à 17:54
+-- Généré le : lun. 14 avr. 2025 à 15:56
 -- Version du serveur : 8.0.31
 -- Version de PHP : 8.0.26
 
@@ -24,27 +24,51 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Structure de la table `batiment`
+-- Structure de la table `batiments`
 --
 
-DROP TABLE IF EXISTS `batiment`;
-CREATE TABLE IF NOT EXISTS `batiment` (
+DROP TABLE IF EXISTS `batiments`;
+CREATE TABLE IF NOT EXISTS `batiments` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nom` varchar(50) DEFAULT NULL,
-  `niveau` int DEFAULT NULL,
-  `planete_id` int DEFAULT NULL,
+  `nom` varchar(255) NOT NULL,
+  `description` text,
+  `cout_construction` int NOT NULL,
+  `temps_construction` int NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `batiments`
+--
+
+INSERT INTO `batiments` (`id`, `nom`, `description`, `cout_construction`, `temps_construction`) VALUES
+(1, 'Laboratoire de recherche', 'Permet de mener des recherches avancées.', 5000, 24),
+(2, 'Chantier spatial', 'Permet de construire des vaisseaux spatiaux.', 10000, 48),
+(3, 'Mine', 'Permet d\'extraire des ressources.', 3000, 12),
+(4, 'Centrale électrique', 'Fournit de l\'énergie pour vos installations.', 4000, 18);
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `laboratoire`
+--
+
+DROP TABLE IF EXISTS `laboratoire`;
+CREATE TABLE IF NOT EXISTS `laboratoire` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `utilisateur_id` int NOT NULL,
+  `niveau` int NOT NULL DEFAULT '1',
   PRIMARY KEY (`id`),
-  KEY `planete_id` (`planete_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `utilisateur_id` (`utilisateur_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Déchargement des données de la table `batiment`
+-- Déchargement des données de la table `laboratoire`
 --
 
-INSERT INTO `batiment` (`id`, `nom`, `niveau`, `planete_id`) VALUES
-(1, 'Mine de fer', 2, 1),
-(2, 'Centrale solaire', 1, 1),
-(3, 'Mine d\'eau', 1, 2);
+INSERT INTO `laboratoire` (`id`, `utilisateur_id`, `niveau`) VALUES
+(1, 1, 5),
+(2, 2, 3);
 
 -- --------------------------------------------------------
 
@@ -67,7 +91,7 @@ CREATE TABLE IF NOT EXISTS `planete` (
 --
 
 INSERT INTO `planete` (`id`, `nom`, `utilisateur_id`, `systeme_id`) VALUES
-(1, 'Gaïa', 1, 1001),
+(1, 'Panete4-1', 1, 3),
 (2, 'Nova', 2, 1002);
 
 -- --------------------------------------------------------
@@ -116,7 +140,7 @@ CREATE TABLE IF NOT EXISTS `systeme_decouvert` (
 --
 
 INSERT INTO `systeme_decouvert` (`id`, `utilisateur_id`, `systeme_id`) VALUES
-(1, 1, 1001),
+(1, 1, 3),
 (2, 2, 1002);
 
 -- --------------------------------------------------------
@@ -133,7 +157,7 @@ CREATE TABLE IF NOT EXISTS `technologie_utilisateur` (
   `niveau` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `utilisateur_id` (`utilisateur_id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Déchargement des données de la table `technologie_utilisateur`
@@ -142,7 +166,10 @@ CREATE TABLE IF NOT EXISTS `technologie_utilisateur` (
 INSERT INTO `technologie_utilisateur` (`id`, `utilisateur_id`, `technologie_id`, `niveau`) VALUES
 (1, 1, 1, 1),
 (2, 1, 2, 0),
-(3, 2, 1, 0);
+(3, 2, 1, 0),
+(8, 1, 1, 1),
+(5, 1, 2, 1),
+(7, 1, 3, 1);
 
 -- --------------------------------------------------------
 
@@ -167,6 +194,34 @@ INSERT INTO `utilisateur` (`id`, `nom_utilisateur`, `email`, `mot_de_passe`) VAL
 (1, 'AlphaCommander', 'alpha@example.com', 'motdepasse1'),
 (2, 'BetaExplorer', 'beta@example.com', 'motdepasse2'),
 (3, 'admin', 'julien1203@gmail.com', 'admin');
+
+-- --------------------------------------------------------
+
+--
+-- Structure de la table `utilisateur_batiments`
+--
+
+DROP TABLE IF EXISTS `utilisateur_batiments`;
+CREATE TABLE IF NOT EXISTS `utilisateur_batiments` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `utilisateur_id` int NOT NULL,
+  `batiment_id` int NOT NULL,
+  `niveau` int NOT NULL DEFAULT '1',
+  `temps_fin` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `utilisateur_id` (`utilisateur_id`),
+  KEY `batiment_id` (`batiment_id`)
+) ENGINE=MyISAM AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Déchargement des données de la table `utilisateur_batiments`
+--
+
+INSERT INTO `utilisateur_batiments` (`id`, `utilisateur_id`, `batiment_id`, `niveau`, `temps_fin`) VALUES
+(9, 1, 4, 2, NULL),
+(8, 1, 3, 2, NULL),
+(7, 1, 3, 2, NULL),
+(6, 1, 1, 1, NULL);
 
 -- --------------------------------------------------------
 
